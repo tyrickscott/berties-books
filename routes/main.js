@@ -137,11 +137,8 @@ module.exports = function(app, shopData) {
          });
     });
 
-    app.get('/deleteuser', function(req, res) {
-        res.render('deleteuser.ejs', shopData);
-    });
 
-    app.post('/deleteuser', function(req, res) {
+    app.get('/deleteuser', function(req, res) {
         const usernameToDelete = req.body.username;
 
         // Delete the user from the database
@@ -152,7 +149,7 @@ module.exports = function(app, shopData) {
             } else {
                 console.log(`User ${usernameToDelete} deleted successfully.`);
                 // Redirect to the listusers page to see the updated user list
-                res.redirect('/listusers');
+                res.render('deleteuser.ejs');
             }
         });
     });

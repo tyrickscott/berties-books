@@ -137,8 +137,11 @@ module.exports = function(app, shopData) {
          });
     });
 
+    app.get('/deleteuser', function (req,res) {
+        res.render('deleteuser.ejs', shopData);                                                                     
+    });  
 
-    app.get('/deleteuser', function(req, res) {
+    app.post('/deleted', function(req, res) {
         const usernameToDelete = req.body.username;
 
         // Delete the user from the database
@@ -153,9 +156,7 @@ module.exports = function(app, shopData) {
             }
         });
     });
-
-
-
+    
     app.get('/addbook', function (req, res) {
         res.render('addbook.ejs', shopData);
      });

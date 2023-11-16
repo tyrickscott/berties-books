@@ -137,6 +137,28 @@ module.exports = function(app, shopData) {
          });
     });
 
+    app.get('/deleteuser', function(req, res) {
+        res.render('deleteuser.ejs', shopData);
+    });
+
+    app.post('/deleteuser', function(req, res) {
+        const usernameToDelete = req.body.username;
+
+        // Delete the user from the database
+        db.query('DELETE FROM users WHERE username = ?', [usernameToDelete], (err, result) => {
+            if (err) {
+                console.error('Error deleting user:', err);
+                res.send('Error deleting user.');
+            } else {
+                console.log(`User ${usernameToDelete} deleted successfully.`);
+                // Redirect to the listusers page to see the updated user list
+                res.redirect('/listusers');
+            }
+        });
+    });
+
+
+
     app.get('/addbook', function (req, res) {
         res.render('addbook.ejs', shopData);
      });

@@ -2,6 +2,13 @@ const bycrypt = require('bcrypt');  //integrating bcrypt library
 const saltRounds = 10;
 module.exports = function(app, shopData) {
 
+    const redirectLogin = (req, res, next) => {
+        if (!req.session.userId ) {
+          res.redirect('./login')
+        } else { next (); }
+    }
+
+
     // Handle our routes
     app.get('/',function(req,res){
         res.render('index.ejs', shopData)
@@ -96,6 +103,8 @@ module.exports = function(app, shopData) {
                             res.send('Error occured during login.');
                         }
                         else if (result === true) {
+                            // Save user session here, when login is successful
+                            req.session.userId = req.body.username;
                             //Successful login
                             res.send('Login successful!');
                         }
@@ -108,6 +117,16 @@ module.exports = function(app, shopData) {
             }
         })
     }); 
+
+    app.get('/logout', redirectLogin, (req,res) => {
+        req.session.destroy(err => {
+        if (err) {
+          return res.redirect('./')
+        }
+        res.send('you are now logged out. <a href='+'./'+'>Home</a>');
+        })
+    })
+
 
     app.get('/listusers', function(req, res) {
         // Fetch user data from the database
@@ -124,7 +143,7 @@ module.exports = function(app, shopData) {
         });
     });
         
-    app.get('/list', function(req, res) {
+    app.get('/list', redirectLogin, function(req, res) {
         let sqlquery = "SELECT * FROM books"; // query database to get all the books
         // execute sql query
         db.query(sqlquery, (err, result) => {

@@ -188,31 +188,71 @@ module.exports = function(app, shopData) {
         res.render('addbook.ejs', shopData);
      });
  
-     app.post('/bookadded', function (req,res) {
-           // saving data in database
-           let sqlquery = "INSERT INTO books (name, price) VALUES (?,?)";
-           // execute sql query
-           let newrecord = [req.body.name, req.body.price];
-           db.query(sqlquery, newrecord, (err, result) => {
-             if (err) {
-               return console.error(err.message);
-             }
-             else
-             res.send(' This book is added to database, name: '+ req.body.name + ' price '+ req.body.price);
-             });
-       });    
+    app.post('/bookadded', function (req,res) {
+        // saving data in database
+        let sqlquery = "INSERT INTO books (name, price) VALUES (?,?)";
+        // execute sql query
+        let newrecord = [req.body.name, req.body.price];
+        db.query(sqlquery, newrecord, (err, result) => {
+            if (err) {
+            return console.error(err.message);
+            }
+            else
+            res.send(' This book is added to database, name: '+ req.body.name + ' price '+ req.body.price);
+            });
+    });    
 
-       app.get('/bargainbooks', function(req, res) {
+    app.get('/bargainbooks', function(req, res) {
         let sqlquery = "SELECT * FROM books WHERE price < 20";
         db.query(sqlquery, (err, result) => {
-          if (err) {
+            if (err) {
              res.redirect('./');
           }
           let newData = Object.assign({}, shopData, {availableBooks:result});
           console.log(newData)
           res.render("bargains.ejs", newData)
         });
-    });       
+    });    
+    
+    // ... (your existing code)
+
+    app.get('/weather', function (req, res) {
+        const request = require('request');
+        const apiKey = 'c4ebc646021d792cc40c8685ca3ffda9';
+        const city = req.query.city || 'London'; // Use the provided city or default to London
+        const url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+
+        request(url, function (error, response, body) {
+            if (error) {
+                console.error('Error:', error);
+                res.render('weather.ejs', { weatherData: null });
+            } else {
+                try {
+                    const weather = JSON.parse(body);
+
+                    if (weather !== undefined && weather.main !== undefined) {
+                        const weatherData = {
+                            name: weather.name,
+                            main: {
+                                temp: weather.main.temp,
+                                humidity: weather.main.humidity,
+                            },
+                            wind: {
+                                speed: weather.wind.speed,
+                                deg: weather.wind.deg,
+                            },
+                        };
+                        res.render('weather.ejs', { weatherData });
+                    } else {
+                        res.render('weather.ejs', { weatherData: null, errorMessage: "No data found" });
+                    }
+                } catch (parseError) {
+                    console.error('Error parsing weather data:', parseError);
+                    res.render('weather.ejs', { weatherData: null, errorMessage: "Error parsing weather data" });
+                }
+            }
+        });
+    });
 
 }
 

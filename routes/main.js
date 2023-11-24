@@ -214,8 +214,6 @@ module.exports = function(app, shopData) {
         });
     });    
     
-    // ... (your existing code)
-
     app.get('/weather', function (req, res) {
         const request = require('request');
         const apiKey = 'c4ebc646021d792cc40c8685ca3ffda9';
@@ -253,6 +251,22 @@ module.exports = function(app, shopData) {
             }
         });
     });
+
+    app.get('/api', function (req,res) {
+
+        // Query database to get all the books
+        let sqlquery = "SELECT * FROM books"; 
+
+        // Execute the sql query
+        db.query(sqlquery, (err, result) => {
+            if (err) {
+                res.redirect('./');
+            }
+            // Return results as a JSON object
+            res.json(result); 
+        });
+    });
+
 
 }
 
